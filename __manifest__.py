@@ -17,12 +17,17 @@
     'version': '17.0.0.1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['point_of_sale', 'ke_etims_tax_pos'],
+    'depends': ['point_of_sale', 'ke_etims_tax'],
     'external_dependencies': {'python': ['qrcode']},
     'license': 'LGPL-3',
     'data': [
-        # 'views/company.xml',
+        'views/pos.xml',
     ],
+    'assets': {
+        'point_of_sale._assets_pos': [ 
+            'ke_etims_tax_pos/static/src/**/*',
+        ],       
+    },
     'application': False,
     'auto_install': True
 }
