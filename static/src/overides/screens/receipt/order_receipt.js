@@ -5,25 +5,23 @@ import { patch } from "@web/core/utils/patch";
 import { useService } from "@web/core/utils/hooks";
 
 patch(Order.prototype, {
-
-    getEtimsData(){
-        let order = this.pos.get_order();
-
-        return new Promise((resolve, reject) => {
-            this.pos.orm.searchRead("pos.order", [['pos_reference', '=', order.name]], ['etims_receipt_sign', 'etims_sdc_date'])
-            .then((data) => {
-                resolve(data);
-            })
-            .catch((err) => {
-                reject(err);
-            })
-        }); 
+    setup () {
+        this.etims_receipt_sign = ''; 
+        this.etims_sdc_date = '';   
+        this.etims_cu = '';   
+        this.etims_invoice = '';   
+        this.etims_internal_data = '';   
+        this.etims_signature = '';        
+        super.setup(...arguments);
     },
     export_for_printing() {
-        const print_data = super.export_for_printing(...arguments);
-        this.getEtimsData().then((data) => {
-            print_data.etims_receipt_sign = data[0].etims_receipt_sign;
-            print_data.etims_sdc_date = data[0].etims_sdc_date;
-        });
-    }
+        const result = super.export_for_printing(...arguments);
+        result.etims_receipt_sign = this.etims_receipt_sign;
+        result.etims_sdc_date = this.etims_sdc_date;
+        result.etims_cu = this.etims_cu;
+        result.etims_internal_data = this.etims_internal_data;
+        result.etims_invoice = this.etims_invoice;
+        result.etims_signature = this.etims_signature;
+        return result;
+    },
 });
