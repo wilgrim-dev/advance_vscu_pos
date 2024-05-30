@@ -105,17 +105,24 @@ class PosOrder(models.Model):
         
         return move, customer, move_lines
                    
-    def _action_etims_sale(self):
+    def action_etims_sale(self):
         self.ensure_one()
         
+        cmcKey = self.env.company.etims_data.get('data').get('info').get('cmcKey') if self.env.company.etims_env == 'test' else \
+            self.env.company.etims_data.get('info').get('cmcKey')
+            
+        sdcId = self.env.company.etims_data.get('data').get('info').get('sdcId') if self.env.company.etims_env == 'test' else \
+            self.env.company.etims_data.get('info').get('sdcId')
+            
         oscu = OSCU(self.company_id.etims_env, self.company_id.vat, self.company_id.etims_branch_id, \
-                    self.company_id.etims_device_info, self.company_id.etims_data.get('data').get('info').get('cmcKey'))
+                    self.company_id.etims_device_info, cmcKey)
         move, receipt, move_lines = self._oscu_prepare_data()
         try:
             response = oscu.TrnsSalesSaveWr(item=move, receipt=receipt, order_line=move_lines)
             _logger.info(f'KRA Response: {response.json()}')
             if response.json()['resultCd'] == '000':
                 data = response.json()['data']
+                data['sdcId'] = sdcId + '/' + self._generate_sequence(self.pos_reference)
                 self.write({'etims_data': data, 'etims_receipt_sign': self._generate_qrcode(data['rcptSign']), 'etims_sdc_date': dt.strptime(data['sdcDateTime'], '%Y%m%d%H%M%S')})
                 # self.message_post(body=f"{self.name} sign to eTIMS successful.")
             else: 
@@ -123,9 +130,4 @@ class PosOrder(models.Model):
                 _logger.info(f'KRA ERROR: {response.json()}')
                 
         except Exception as e:
-            raise UserError(_(f'eTIMS signing raised error {e}'))        
-    
-    def action_pos_order_paid(self):      
-        if self.company_id.etims_data:
-            self._action_etims_sale()
-        return super().action_pos_order_paid()  
+            raise UserError(_(f'eTIMS signing raised error {e}'))
