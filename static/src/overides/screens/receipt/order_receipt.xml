@@ -11,12 +11,27 @@
                 
                     <p style="font-size: 11px !important;">
                         <span>
+                            CU: <t t-esc="props.data.etims_cu"/>
+                        </span>
+                    </p>
+                    <p style="font-size: 11px !important;">
+                        <span>
+                            SIGNATURE: <t t-esc="props.data.etims_signature"/>
+                        </span>
+                    </p>
+                    <p style="font-size: 11px !important;">
+                        <span>
                             INVOICE DATE: <t t-esc="props.data.etims_sdc_date"/>
                         </span>
                     </p> 
                     <p style="font-size: 11px !important;">
                         <span>
-                            DEVICE SERIAL: <t t-esc="props.data.etims_sdc_date"/>
+                            INVOICE NO.: <t t-esc="props.data.etims_invoice"/>
+                        </span>
+                    </p>
+                    <p style="font-size: 11px !important;">
+                        <span>
+                            INTERNAL DATA: <t t-esc="props.data.etims_internal_data"/>
                         </span>
                     </p>
                 </div>
