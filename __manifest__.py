@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "KRA POS eTIMS Integration",
+    'name': "KRA POS eTIMS VSCU Integration",
 
     'summary': """
         Kra electronically signs pos receipts.""",
@@ -17,15 +17,16 @@
     'version': '17.0.0.1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['point_of_sale', 'ke_etims_tax'],
+    'depends': ['point_of_sale'],
     'external_dependencies': {'python': ['qrcode']},
     'license': 'LGPL-3',
     'data': [
         'views/pos.xml',
+        'views/pos_config.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [ 
-            'ke_etims_tax_pos/static/src/**/*',
+            'advance_vscu_pos/static/src/**/*',
         ],       
     },
     'application': False,
