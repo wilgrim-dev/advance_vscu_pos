@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- pos.config inherit form view -->
+    <record id="vscu_pos.config_view_form" model="ir.ui.view">
+        <field name="name">pos.config.view.form.inherit.advance_vscu_pos</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_settings_container')]/setting[last()])" position="after">
+                <setting id="vscu_tax_setting" title="Apply VSCU signing on order">
+                    <label string="Default VSCU Setup" for="vscu_config"/>
+                    <i class="fa fa-info-circle me-1" title="This setting is common to this PoS." pos-data-toggle="tooltip"/>
+                    <div class="text-muted">
+                        All orders signed to VSCU?
+                    </div>
+                    <div class="content-group mt16">
+                        <field name="vscu_config" colspan="4" nolabel="1"/>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>            
