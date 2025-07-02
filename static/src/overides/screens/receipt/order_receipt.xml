@@ -1,37 +1,37 @@
 <?xml version='1.0' encoding='utf-8'?>
 <templates id="template" xml:space="preserve">
 
-    <t t-name="ke_etims_tax_pos.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+    <t t-name="advance_vscu_pos.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
 
         <xpath expr="//div[hasclass('pos-receipt')]//div[hasclass('before-footer')]" position="after">
-            <div t-if="props.data.etims_receipt_sign">
+            <div t-if="props.data.vscu_qr_code">
                 <br />
                 <div class="text-center">
-                    <img  id="etims_qrcode" t-att-src="'data:image/png;base64,' + props.data.etims_receipt_sign" width="110" heigh="110" style="margin: 0 auto !important;"/>
+                    <img  id="vscu_qrcode" t-att-src="'data:image/png;base64,' + props.data.vscu_qr_code" width="110" heigh="110" style="margin: 0 auto !important;"/>
                 
                     <p style="font-size: 11px !important;">
                         <span>
-                            CU: <t t-esc="props.data.etims_cu"/>
+                            CU: <t t-esc="props.data.vscu_cu"/>
                         </span>
                     </p>
-                    <p style="font-size: 11px !important;">
+                    <!-- <p style="font-size: 11px !important;">
                         <span>
-                            SIGNATURE: <t t-esc="props.data.etims_signature"/>
+                            SIGNATURE: <t t-esc="props.data.vscu_serial"/>
                         </span>
-                    </p>
+                    </p> -->
                     <p style="font-size: 11px !important;">
                         <span>
-                            INVOICE DATE: <t t-esc="props.data.etims_sdc_date"/>
+                            INVOICE DATE: <t t-esc="props.data.vscu_date"/>
                         </span>
                     </p> 
                     <p style="font-size: 11px !important;">
                         <span>
-                            INVOICE NO.: <t t-esc="props.data.etims_invoice"/>
+                            INVOICE NO.: <t t-esc="props.data.vscu_invoice"/>
                         </span>
                     </p>
                     <p style="font-size: 11px !important;">
                         <span>
-                            INTERNAL DATA: <t t-esc="props.data.etims_internal_data"/>
+                            INTERNAL DATA: <t t-esc="props.data.vscu_data"/>
                         </span>
                     </p>
                 </div>

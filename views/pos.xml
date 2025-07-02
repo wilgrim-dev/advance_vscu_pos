@@ -9,8 +9,8 @@
 
             <xpath expr="//page[@name='extra']" position="inside">
                 <group name="vscu" string="VSCU">
-                    <field name="vscu_sdc_date"/>
-                    <field name="vscu_receipt_sign" widget='image' class="oe_avatar"/>
+                    <field name="vscu_date"/>
+                    <field name="vscu_qr_code" widget='image' class="oe_avatar"/>
                 </group>
             </xpath>
 
