@@ -2,6 +2,7 @@ import logging, requests, base64, re
 from datetime import datetime as dt
 from io import BytesIO
 from qrcode import QRCode, constants
+from requests.auth import HTTPBasicAuth
 
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError, UserError
@@ -50,83 +51,138 @@ class PosOrder(models.Model):
         self.ensure_one()
         """
         :Returns return: {
-            "invoice_date":"12/22/21",
-            "invoice_number":"SIN-00009279025132",
-            "invoice_pin":"P051534464J",
-            "customer_pin":"A007650714L",
-            "customer_exid":"",
-            "grand_total":"435,850",
-            "tax_total":"60,117.24",
-            "sel_currency":"KSH",
-            "rel_doc_number":"",
-            "items_list":
-            [
-               " CATTLE 10 SALT 10KG BAG 30 170.00 5,100.00",
-               " CATTLE SALT 50KG BAG 1 650.00 650.00"
+            "traderInvoiceNo": "123",
+            "totalAmount": 2023.68,
+            "paymentType": "01",
+            "salesTypeCode": "N",
+            "receiptTypeCode": "S",
+            "salesStatusCode": "01",
+            "salesDate": "20240509050115",
+            "currency": "KES",
+            "exchangeRate": 1.0,
+            "salesItems": [
+                {
+                "itemCode": "KE1UCT0000015",
+                "qty": 1,
+                "pkg": 0,
+                "unitPrice": 193.84,
+                "amount": 193.84,
+                "discountAmount": 0
+                }
             ],
-            "net_discount_total":"3,750",
-            "net_subtotal":"375,732.76"
-        }
+            "customerPin": "P00000000004s"
+            }
         """
-        item_list = [line.product_id.product_hs_code.replace('"', '\\"') + ' ' + line.product_id.name.replace('"', '\\"') + f' {line.quantity} {line.price_unit} {line.price_subtotal}' if line.product_id.product_hs_code\
-            else line.product_id.name.replace('"', '\\"') + f' {line.quantity} {line.price_unit} {line.price_subtotal}' for line in self.invoice_line_ids]        
+        item_list = [{
+            "itemCode": "KE2UCT0027536" or line.product_id.product_hs_code,
+            "qty": line.qty,
+            "pkg": 0,
+            "unitPrice": line.price_unit,
+            "amount": line.price_subtotal_incl,
+            "discountAmount": line.discount
+        } for line in self.lines]
+        
         return {
-            'invoice_date': dt.strftime(self.invoice_date, '%m/%d/%Y'),
-            'invoice_number': self.name,
-            'invoice_pin': self.env.company.vat,
-            'customer_pin': self.partner_id.vat,
-            'sel_currency': 'KSH',
-            'grand_total': str(self.amount_total),
-            'tax_total': str(self.amount_tax),
-            'rel_doc_number': self.reversed_entry_id.vscu_cu if self.reversed_entry_id else '',
-            'customer_exid': '',                                
-            'items_list': item_list,
-            'net_discount_total': str(sum([line.discount for line in self.invoice_line_ids])),
-            'net_subtotal': str(self.amount_untaxed)
+            "traderInvoiceNo": self._vscu_sequence(self.pos_reference),
+            "totalAmount": self.amount_total,
+            "paymentType": "01",
+            "salesTypeCode": "N",
+            "receiptTypeCode": "S",
+            "salesStatusCode": "01",
+            "salesDate": dt.strftime(self.date_order, '%Y%m%d%H%M%S'),
+            "currency": "KES",
+            "exchangeRate": 1.0,
+            "salesItems": item_list,
+            "customerPin": self.partner_id.vat if self.partner_id.vat else ""
         }
-         
+        
     @api.model          
-    def action_vscu_sale(self):
-        self.ensure_one()
+    def action_vscu_sale(self, order_id):
         """
         Method to send invoice data for signing;
         :response: {
-                "invoice_number": "SIN-0000024966",
-                "cu_serial_number": "KRAMW004202110009550 11.08.2022 12\:11\:10",
-                "invoice_date": "11.08.2022 12\:11\:10",
-                "cu_invoice_number": "0040095500000000001",
-                "verify_url": "https\://itax.kra.go.ke/KRA-Portal/invoiceChk.htm?actionCode=loadPage&invoiceNo=0040095500000000001",
-                "description": "Signed successfully."
+            "status": 200,
+            "statusCode": "SUCCES",
+            "message": "Invoice with trader invoice No 123  already exists",
+            "data": {
+                "invoiceNo": 2,
+                "traderInvoiceNo": "123",
+                "totalAmount": 193.84,
+                "totalTaxableAmount": 193.84,
+                "totalTaxAmount": 0,
+                "paymentType": "01",
+                "salesTypeCode": "N",
+                "receiptTypeCode": "S",
+                "salesStatusCode": "01",
+                "salesDate": "20240607070732",
+                "currency": "KES",
+                "internalData": "N6L6AMLNWHFDBZK4PIEDWDMO4Y",
+                "signature": "5BBQL4WBFUVSPUT7",
+                "scdcId": "KRACU0300000288",
+                "scuReceiptDate": "20240607070733",
+                "scuReceiptNo": 2,
+                "invoiceVerificationUrl": "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data=P051885316K015BBQL4WBFUVSPUT7",
+                "salesItems": [
+                    {
+                        "id": 75,
+                        "unitPrice": 193.84,
+                        "amount": 193.84,
+                        "taxableAmount": 193.84,
+                        "taxAmount": 0,
+                        "discount": 0,
+                        "itemCode": "KE1UCT0000023",
+                        "itemClassCode": "99000000",
+                        "pkgUnitCode": "CT",
+                        "qtyUnitCode": "U",
+                        "pkg": 0,
+                        "supplyAmount": 193.84,
+                        "taxTypeCode": "A",
+                        "insuranceCompanyCode": null,
+                        "insuranceCompanyName": null,
+                        "insuranceRate": null,
+                        "insuranceAmount": null,
+                        "qty": 1
+                    }
+                ],
+                "customerPin": "",
+                "customerName": ""
             }
+        }
         """
+        response = {}
+        self = self.env[self._name].browse(order_id)
+        
         base_url = self.env['ir.config_parameter'].sudo().get_param('vscu.url')
-        headers = self.env['ir.config_parameter'].sudo().get_param('vscu.auth')
-        if not base_url or not headers: raise UserError('Kindly setup ```vscu.url``` or ```vscu.auth``` param in system configuration!')
+        username = self.env['ir.config_parameter'].sudo().get_param('vscu.username')
+        password = self.env['ir.config_parameter'].sudo().get_param('vscu.password')
+        
+        if not (base_url, username, password): 
+            return {'hasError': True, 'message': 'Kindly setup ```vscu.url/vscu.username/vscu.password``` param in system configuration!'}
+        
         try:
-            url = ''
-            if self.move_type == 'out_invoice': url = base_url + '/api/sign?invoice+1'
-            elif self.move_type == 'out_refund': url = base_url + '/api/sign?invoice+2'
-            else: url = base_url + '/api/sign?invoice+3'
+            url = base_url + '/invoices'
             
-            payload = self._prepare_vscu_payload()
-            _logger.info(f'VSCU Payload: {payload}, url {url}')
+            payload = self._vscu_prepare_data()
+            auth = HTTPBasicAuth(username, password)
+            _logger.info(f'VSCU Payload: {payload}, cred {url, username, password}')
             
-            response = requests.post(url, json=payload, headers={'Authorization': headers})
-            data = eval(response.text)
+            data = requests.post(url, json=payload, auth=auth, headers={'Content-Type': 'application/json'}).json()
+            
             _logger.info(f'VSCU Response: {data}')
-            if data.get('cu_invoice_number'):
-                qrcode = self._vscu_generate_qrcode(re.sub(r"\\", "", data.get('verify_url')))
-                data['invoice_date'] = data.get('cu_serial_number').split(' ')[1]  + ' ' + re.sub(r"\\", "", data.get('cu_serial_number').split(' ')[2]) 
-                data['cu_serial_number'] = data.get('cu_serial_number').split(' ')[0]
+            if data.get('status') == 200:
+                signData = data['data']
+                qrcode = self._vscu_qrcode(re.sub(r"\\", "", signData.get('invoiceVerificationUrl')))
                 self.write({
                     'vscu_data': data,
                     'vscu_qr_code': qrcode,
-                    'vscu_cu': data['cu_invoice_number'],
-                    'vscu_date': dt.strptime(data['invoice_date'], '%d.%m.%Y %H:%M:%S'),
-                    'vscu_serial': data['cu_serial_number']
+                    'vscu_cu': signData['scuReceiptNo'],
+                    'vscu_date': dt.strptime(signData['scuReceiptDate'], '%Y%m%d%H%M%S'),
+                    'vscu_serial': signData['scdcId']
                 })
-                self.message_post(body=f"{data.get('description')} signature {data.get('cu_invoice_number')}")
+                response.update({'hasError': False, 'message': _(f"{data['message']}")})
             else:
-                self.message_post(body=f"Unsuccessful sign, message: {data}")
+                response.update({'hasError': True, 'message': _(f"Unsuccessful sign, message: {data['message']}")})
         except Exception as e:
-            raise UserError(_(e))
+            response.update({'hasError': True, 'message': _(e)})
+        
+        return response
