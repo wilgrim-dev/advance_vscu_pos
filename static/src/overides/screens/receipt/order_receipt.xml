@@ -11,14 +11,14 @@
                 
                     <p style="font-size: 11px !important;">
                         <span>
-                            CU: <t t-esc="props.data.vscu_cu"/>
+                            CU: <t t-esc="props.data.vscu_data.data.scdcId"/>
                         </span>
                     </p>
-                    <!-- <p style="font-size: 11px !important;">
+                    <p style="font-size: 11px !important;">
                         <span>
-                            SIGNATURE: <t t-esc="props.data.vscu_serial"/>
+                            SIGNATURE: <t t-esc="props.data.vscu_data.data.signature"/>
                         </span>
-                    </p> -->
+                    </p>
                     <p style="font-size: 11px !important;">
                         <span>
                             INVOICE DATE: <t t-esc="props.data.vscu_date"/>
@@ -26,12 +26,12 @@
                     </p> 
                     <p style="font-size: 11px !important;">
                         <span>
-                            INVOICE NO.: <t t-esc="props.data.vscu_invoice"/>
+                            INVOICE NO.: <t t-esc="props.data.vscu_data.data.invoiceNo"/>
                         </span>
                     </p>
                     <p style="font-size: 11px !important;">
                         <span>
-                            INTERNAL DATA: <t t-esc="props.data.vscu_data"/>
+                            INTERNAL DATA: <t t-esc="props.data.vscu_data.data.internalData"/>
                         </span>
                     </p>
                 </div>
