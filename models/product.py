@@ -225,7 +225,33 @@ class ProductProduct(models.Model):
             _logger.info(f'VSCU Response: {data, product}')
             self.product_hs_code = data['data']['itemCode']
         except Exception as e:
-            raise ValidationError(e)
+            message = e.response.json()['message']
+            if message == 'Item with that name already exists':
+                try:
+                    url = base_url + f'/items/{self.product_hs_code}'
+                    product = {
+                        **product,
+                        "stock": self.qty_available
+                    }
+                    resp = requests.put(url, auth=auth, json=product, headers={'Content-Type': 'application/json'})
+                    resp.raise_for_status()
+                    resp = resp.json()
+                    _logger.info(f'Update: {resp}')
+                    
+                    if resp['status'] == 200:
+                        return {
+                            "type": "ir.actions.client",
+                            "tag": "display_notification",
+                            "params": {
+                                "title": "Success",
+                                "message": resp['message'],
+                                "type": "success",
+                            },
+                        }
+                except Exception as e:
+                    message = e.response.json()
+                    _logger.error(message)
+            raise ValidationError(message)
 
 class AccountTax(models.Model):
     _inherit = 'account.tax'
