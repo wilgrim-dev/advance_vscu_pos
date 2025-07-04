@@ -23,6 +23,7 @@
     'data': [
         'views/pos.xml',
         'views/pos_config.xml',
+        'views/product.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [ 
