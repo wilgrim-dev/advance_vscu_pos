@@ -175,14 +175,20 @@ class ProductProduct(models.Model):
                 if item['name'] == self.name:
                     self.product_hs_code = item['itemCode']        
                 
-    def action_get_qty_codes(self):
+    # def action_get_qty_codes(self):
+    #     self._get_qtyUnitCode()
+        
+    # def action_get_pkg_codes(self):
+    #     self._get_pkgUnitCode()
+        
+    # def action_get_item_codes(self):
+    #     self._get_itemClassCode()
+        
+    def action_vscu_data(self):
         self._get_qtyUnitCode()
-        
-    def action_get_pkg_codes(self):
-        self._get_pkgUnitCode()
-        
-    def action_get_item_codes(self):
         self._get_itemClassCode()
+        self._get_pkgUnitCode()
+        self._get_items()
         
     def action_save_vscu(self):
         """ Payload: {
@@ -224,9 +230,9 @@ class AccountTax(models.Model):
     _inherit = 'account.tax'
     
     tax_class = fields.Selection([
-        ('A', '16%'),
-        ('B', '8%'),
-        ('C', '0%'),
-        ('D', 'Zero Rated'),
-        ('E', 'Exempted'),
+        ('A', 'Exempt'),
+        ('B', '16%'),
+        ('C', 'Zero Rated'),
+        ('D', '8%'),
+        ('E', '0%'),
         ], string='Tax Class')

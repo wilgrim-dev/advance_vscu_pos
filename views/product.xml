@@ -17,9 +17,7 @@
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button string="Pkg Codes" type="object" name="action_get_pkg_codes"/>
-                <button string="Qty Codes" type="object" name="action_get_qty_codes"/>
-                <button string="Item Codes" type="object" name="action_get_item_codes"/>
+                <button string="VSCU Data" type="object" name="action_vscu_data"/>
                 <button string="Save VSCU" type="object" name="action_save_vscu"/>
             </xpath>
             <xpath expr="//field[@name='detailed_type']" position="after">
