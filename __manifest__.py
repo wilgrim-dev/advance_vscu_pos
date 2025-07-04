@@ -17,7 +17,7 @@
     'version': '17.0.0.1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['point_of_sale'],
+    'depends': ['point_of_sale', 'product', 'account'],
     'external_dependencies': {'python': ['qrcode']},
     'license': 'LGPL-3',
     'data': [
