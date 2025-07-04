@@ -49,16 +49,16 @@ patch(PaymentScreen.prototype, {
     },
 
     async afterOrderValidation(suggestToSync = true) {
-        var paymentMethods = this.pos.payment_methods;       
+        var vscuSign = false;    
         var paymentlines = this.currentOrder.paymentlines;
-        paymentMethods.find((line) => {
-            line.cid === cid
-        })
+
         for (var i in paymentlines) {
-            console.log(paymentlines[i], paymentMethods)
-            // if (paymentlines[i].vscu_sign) { 
-            //     await this.getVscuData();
-            // }
+            if (paymentlines[i].payment_method.vscu_sign) { 
+                vscuSign = true;
+            }
+        }
+        if (vscuSign) {
+            await this.getVscuData();
         }
 
         await super.afterOrderValidation(...arguments);
