@@ -153,7 +153,7 @@ class PosOrder(models.Model):
         username = self.env['ir.config_parameter'].sudo().get_param('vscu.username')
         password = self.env['ir.config_parameter'].sudo().get_param('vscu.password')
         
-        if not (base_url, username, password): 
+        if not base_url or not username or not password: 
             return {'hasError': True, 'message': 'Kindly setup ```vscu.url/vscu.username/vscu.password``` param in system configuration!'}
         
         try:
