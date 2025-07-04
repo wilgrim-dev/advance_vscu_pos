@@ -31,25 +31,31 @@ class ProductProduct(models.Model):
     @api.model
     def _update_qty_code(self):
         qty_codes = []
-        with open(JSON_FILE[0], 'r', encoding='utf-8') as f:
-            read_data = json.load(f)['data']
-        if isinstance(read_data, list):
-            for item in read_data:
-                key = item.get('code')
-                value = item.get('name')
-                if (key, value) not in qty_codes: qty_codes.append((key, value))
+        try:
+            with open(JSON_FILE[0], 'r', encoding='utf-8') as f:
+                read_data = json.load(f)['data']
+            if isinstance(read_data, list):
+                for item in read_data:
+                    key = item.get('code')
+                    value = item.get('name')
+                    if (key, value) not in qty_codes: qty_codes.append((key, value))
+        except Exception as e:
+            return qty_codes
         return qty_codes
     
     @api.model
     def _update_pkg_code(self):
-        pkg_codes = []
-        with open(JSON_FILE[1], 'r', encoding='utf-8') as f:
-            read_data = json.load(f)['data']
-        if isinstance(read_data, list):
-            for item in read_data:
-                key = item.get('code')
-                value = item.get('name')
-                if (key, value) not in pkg_codes: pkg_codes.append((key, value)) 
+        pkg_codes = []        
+        try:
+            with open(JSON_FILE[1], 'r', encoding='utf-8') as f:
+                read_data = json.load(f)['data']
+            if isinstance(read_data, list):
+                for item in read_data:
+                    key = item.get('code')
+                    value = item.get('name')
+                    if (key, value) not in pkg_codes: pkg_codes.append((key, value)) 
+        except Exception as e:
+            return pkg_codes
         return pkg_codes
     
     @api.model
@@ -210,6 +216,7 @@ class ProductProduct(models.Model):
             url = base_url + '/items'                     
             data = requests.post(url, json=product, auth=auth, headers={'Content-Type': 'application/json'}).json()
             _logger.info(f'VSCU Response: {data, product}')
+            self._get_items()
         except Exception as e:
             raise ValidationError(e)
 
