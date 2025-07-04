@@ -20,10 +20,7 @@ class PosOrder(models.Model):
     vscu_cu = fields.Char('CU', copy=False, readonly=True)
     vscu_date = fields.Datetime('Date', copy=False, readonly=True)
     vscu_serial = fields.Char('CU Serial', copy=False, readonly=True)
-       
-    def _vscu_item_code(self, product, uom_id):
-        pass
-    
+           
     def _vscu_qrcode(self, url):                
         qr = QRCode(version=1, box_size=25, border=6, error_correction=constants.ERROR_CORRECT_L)
         qr.add_data(url)
@@ -74,7 +71,7 @@ class PosOrder(models.Model):
             }
         """
         item_list = [{
-            "itemCode": "KE2UCT0027536" or line.product_id.product_hs_code,
+            "itemCode": line.product_id.product_hs_code,
             "qty": line.qty,
             "pkg": 0,
             "unitPrice": line.price_unit,
