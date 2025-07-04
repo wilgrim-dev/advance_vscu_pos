@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="vscu_view_account_tax_form" model="ir.ui.view">
+        <field name="name">account.tax.inherit.view.form</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="before">
+                <field name="tax_class"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="vscu_view_product_template_form" model="ir.ui.view">
+        <field name="name">product.product.inherit.view.form</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button string="Pkg Codes" type="object" name="action_get_pkg_codes"/>
+                <button string="Qty Codes" type="object" name="action_get_qty_codes"/>
+                <button string="Item Codes" type="object" name="action_get_item_codes"/>
+                <button string="Save VSCU" type="object" name="action_save_vscu"/>
+            </xpath>
+            <xpath expr="//field[@name='detailed_type']" position="after">
+                <field name="product_hs_code"/>
+                <field name="qty_code"/>
+                <field name="pkg_code"/>
+                <field name="item_code"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
