@@ -83,8 +83,8 @@ class ProductProduct(models.Model):
         username = self.env['ir.config_parameter'].sudo().get_param('vscu.username')
         password = self.env['ir.config_parameter'].sudo().get_param('vscu.password')
         
-        if not (base_url, username, password): 
-            raise UserError('Kindly setup ```vscu.url/vscu.username/vscu.password``` param in system configuration!')
+        if not base_url or not username or not password:
+            raise UserError("Kindly setup vscu.url, vscu.username, and vscu.password parameters in system configuration!")
         
         auth = HTTPBasicAuth(username, password)   
         
@@ -92,10 +92,9 @@ class ProductProduct(models.Model):
            
     def _get_qtyUnitCode(self):          
         base_url, auth = self._set_vscu_credentials()
-        
-        url = base_url + '/qtyunitcodes'
-        
+                
         try:
+            url = base_url + '/qtyunitcodes'
             response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
             response.raise_for_status()
             qtyUnitCode = response.json()
@@ -112,9 +111,8 @@ class ProductProduct(models.Model):
     def _get_pkgUnitCode(self):
         base_url, auth = self._set_vscu_credentials()
         
-        url = base_url + '/pkgunitcodes'
-        
         try:
+            url = base_url + '/pkgunitcodes'
             response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
             response.raise_for_status()
             pkgUnitCode = response.json()
@@ -131,9 +129,8 @@ class ProductProduct(models.Model):
     def _get_itemClassCode(self):
         base_url, auth = self._set_vscu_credentials()
         
-        url = base_url + '/itemcodes'
-        
         try:
+            url = base_url + '/itemcodes'
             response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
             response.raise_for_status()
             itemClassCode = response.json()
@@ -150,9 +147,8 @@ class ProductProduct(models.Model):
     def _get_items(self):
         base_url, auth = self._set_vscu_credentials()
         
-        url = base_url + '/items'
-        
         try:
+            url = base_url + '/items'
             response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
             response.raise_for_status()
             items = response.json()
@@ -167,13 +163,16 @@ class ProductProduct(models.Model):
     
     @api.depends('qty_code', 'pkg_code', 'item_code')
     def _compute_product_hs_code(self):
-        self.ensure_one()
-        with open(JSON_FILE[3], 'r', encoding='utf-8') as f:
-            read_data = json.load(f)['data']
-        if isinstance(read_data, list):
-            for item in read_data:
-                if item['name'] == self.name:
-                    self.product_hs_code = item['itemCode']        
+        for product in self:
+            try:
+                with open(JSON_FILE[3], 'r', encoding='utf-8') as f:
+                    read_data = json.load(f)['data']
+                if isinstance(read_data, list):
+                    for item in read_data:
+                        if item['name'] == self.name:
+                            product.product_hs_code = item['itemCode']    
+            except Exception as e:
+                pass
                 
     # def action_get_qty_codes(self):
     #     self._get_qtyUnitCode()
@@ -205,7 +204,7 @@ class ProductProduct(models.Model):
         """
         self.ensure_one()
         product = {
-            "name": self.name,
+            "name": self.name.strip(),
             "orgCountryCode": "KE",
             "unitPrice": self.list_price,
             "itemTypeCode": str(ITEM_CODE[self.detailed_type]),
@@ -220,9 +219,11 @@ class ProductProduct(models.Model):
         
         try:
             url = base_url + '/items'                     
-            data = requests.post(url, json=product, auth=auth, headers={'Content-Type': 'application/json'}).json()
+            data = requests.post(url, json=product, auth=auth, headers={'Content-Type': 'application/json'})
+            data.raise_for_status()
+            data = data.json()
             _logger.info(f'VSCU Response: {data, product}')
-            self._get_items()
+            self.product_hs_code = data['data']['itemCode']
         except Exception as e:
             raise ValidationError(e)
 
