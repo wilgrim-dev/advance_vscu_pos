@@ -183,5 +183,6 @@ class PosOrder(models.Model):
                 response.update({'hasError': True, 'message': _(f"Unsuccessful sign, message: {data['message']}")})
         except Exception as e:
             response.update({'hasError': True, 'message': _(e.response.json())})
+            _logger.error(f'VSCU Error: {response}')
         
         return response
