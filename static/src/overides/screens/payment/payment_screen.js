@@ -13,7 +13,7 @@ patch(PaymentScreen.prototype, {
         }
         this.env.services.popup.add(ErrorPopup, {
             title: title,
-            body: msg,
+            body: _t(msg),
         });
     },
     
@@ -26,7 +26,7 @@ patch(PaymentScreen.prototype, {
         let vscuData = await this.orm.call('pos.order', 'action_vscu_sale', [[order_server_id]]);
 
         if (vscuData.hasError) {
-            return this._showError(vscuData.message);
+            return this._showError(vscuData.message?.message || vscuData.message);
         }
         
         return new Promise((resolve, reject) => {
