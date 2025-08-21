@@ -95,7 +95,7 @@ class ProductProduct(models.Model):
                 
         try:
             url = base_url + '/qtyunitcodes'
-            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
+            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'}, timeout=60)
             response.raise_for_status()
             qtyUnitCode = response.json()
             
@@ -113,7 +113,7 @@ class ProductProduct(models.Model):
         
         try:
             url = base_url + '/pkgunitcodes'
-            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
+            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'}, timeout=60)
             response.raise_for_status()
             pkgUnitCode = response.json()
             
@@ -131,7 +131,7 @@ class ProductProduct(models.Model):
         
         try:
             url = base_url + '/itemcodes'
-            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
+            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'}, timeout=60)
             response.raise_for_status()
             itemClassCode = response.json()
             
@@ -149,7 +149,7 @@ class ProductProduct(models.Model):
         
         try:
             url = base_url + '/items'
-            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'})
+            response = requests.get(url, auth=auth, headers={'Content-Type': 'application/json'}, timeout=60)
             response.raise_for_status()
             items = response.json()
             
@@ -219,7 +219,7 @@ class ProductProduct(models.Model):
         
         try:
             url = base_url + '/items'                     
-            data = requests.post(url, json=product, auth=auth, headers={'Content-Type': 'application/json'})
+            data = requests.post(url, json=product, auth=auth, headers={'Content-Type': 'application/json'}, timeout=60)
             data.raise_for_status()
             data = data.json()
             _logger.info(f'VSCU Response: {data, product}')
@@ -233,7 +233,7 @@ class ProductProduct(models.Model):
                         **product,
                         "stock": self.qty_available
                     }
-                    resp = requests.put(url, auth=auth, json=product, headers={'Content-Type': 'application/json'})
+                    resp = requests.put(url, auth=auth, json=product, headers={'Content-Type': 'application/json'}, timeout=60)
                     resp.raise_for_status()
                     resp = resp.json()
                     _logger.info(f'Update: {resp}')
