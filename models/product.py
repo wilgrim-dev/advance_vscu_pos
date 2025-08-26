@@ -25,6 +25,15 @@ ITEM_CODE = {
     'product': 2,    
 }
 
+_notification = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'type': 'warning',
+        'sticky': True,
+    }
+}
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
     
@@ -224,7 +233,7 @@ class ProductProduct(models.Model):
             data = data.json()
             _logger.info(f'VSCU Response: {data, product}')
             self.product_hs_code = data['data']['itemCode']
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             message = e.response.json()['message']
             if message == 'Item with that name already exists':
                 try:
@@ -248,10 +257,13 @@ class ProductProduct(models.Model):
                                 "type": "success",
                             },
                         }
-                except Exception as e:
+                except requests.exceptions.RequestException as e:
                     message = e.response.json()
                     _logger.error(message)
             raise ValidationError(message)
+        except Exception as e:
+            raise ValidationError(e)
+        
 
 class AccountTax(models.Model):
     _inherit = 'account.tax'
