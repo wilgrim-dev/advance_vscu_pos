@@ -163,7 +163,7 @@ class PosOrder(models.Model):
             auth = HTTPBasicAuth(username, password)
             _logger.info(f'VSCU Payload: {payload}, cred {url, username, password}')
             
-            data = requests.post(url, json=payload, auth=auth, headers={'Content-Type': 'application/json'}, timeout=30)
+            data = requests.post(url, json=payload, auth=auth, headers={'Content-Type': 'application/json'}, timeout=10)
             data.raise_for_status()
             data = data.json()
             
