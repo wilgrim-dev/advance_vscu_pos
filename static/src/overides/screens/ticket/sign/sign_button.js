@@ -59,16 +59,23 @@ export class SignReceiptButton extends Component {
             return;
         }
 
-        let vscuData = await this.orm.searchRead("pos.order", [['pos_reference', '=', this.props.order.name]], ['vscu_qr_code', 'vscu_date', 'vscu_data']);
+        let order = this.props.order;
+        let vscuData = await this.orm.searchRead("pos.order", [['pos_reference', '=', order.name]], ['vscu_qr_code', 'vscu_date', 'vscu_data']);
 
-        if (vscuData[0].vscu_data) { return; }
-
-        await this._getVscuData(this.props.order);
+        if (vscuData[0].vscu_data) { 
+            order.vscu_qr_code = vscuData[0].vscu_qr_code;
+            order.vscu_date = vscuData[0].vscu_date;
+            order.vscu_cu = vscuData[0].vscu_serial;
+            order.vscu_invoice = vscuData[0].vscu_cu;
+            order.vscu_data = vscuData[0].vscu_data;
+        } else {
+            await this._getVscuData(order);
+        }
 
         // Need to await to have the result in case of automatic skip screen.
         (await this.printer.print(OrderReceipt, {
-            data: this.props.order.export_for_printing(),
+            data: order.export_for_printing(),
             formatCurrency: this.env.utils.formatCurrency,
-        })) || this.pos.showScreen("ReprintReceiptScreen", { order: this.props.order });
+        })) || this.pos.showScreen("ReprintReceiptScreen", { order });
     }
 }
