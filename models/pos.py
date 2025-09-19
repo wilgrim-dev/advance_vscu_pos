@@ -163,7 +163,7 @@ class PosOrder(models.Model):
             auth = HTTPBasicAuth(username, password)
             _logger.info(f'VSCU Payload: {payload}, cred {url, username, password}')
             
-            data = requests.post(url, json=payload, auth=auth, headers={'Content-Type': 'application/json'})
+            data = requests.post(url, json=payload, auth=auth, headers={'Content-Type': 'application/json'}, timeout=30)
             data.raise_for_status()
             data = data.json()
             
@@ -181,6 +181,9 @@ class PosOrder(models.Model):
                 response.update({'hasError': False, 'message': _(f"{data['message']}")})
             else:
                 response.update({'hasError': True, 'message': _(f"Unsuccessful sign, message: {data['message']}")})
+        except requests.exceptions.Timeout as e:
+            response.update({'hasError': True, 'message': _(e)})
+            _logger.error(f'VSCU Error: {response}')
         except Exception as e:
             response.update({'hasError': True, 'message': _(e.response.json())})
             _logger.error(f'VSCU Error: {response}')
