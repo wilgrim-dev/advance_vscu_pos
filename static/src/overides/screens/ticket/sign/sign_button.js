@@ -55,9 +55,13 @@ export class SignReceiptButton extends Component {
         }); 
     }
     async click() {
-        if (!this.props.order || this.props.order.vscu_data) {
+        if (!this.props.order) {
             return;
         }
+
+        let vscuData = await this.orm.searchRead("pos.order", [['pos_reference', '=', this.props.order.name]], ['vscu_qr_code', 'vscu_date', 'vscu_data']);
+
+        if (vscuData[0].vscu_data) { return; }
 
         await this._getVscuData(this.props.order);
 
