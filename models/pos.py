@@ -163,6 +163,8 @@ class PosOrder(models.Model):
             url = base_url + '/invoices'
             
             payload = self._vscu_prepare_data()
+            if not isinstance(payload, dict): return {"hasError": True, "message": "An item is missing a valid item code. Please correct the product's HS Code."}
+            
             auth = HTTPBasicAuth(username, password)
             _logger.info(f'VSCU Payload: {payload}, cred {url, username, password}')
             
