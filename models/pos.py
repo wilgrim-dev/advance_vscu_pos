@@ -70,6 +70,9 @@ class PosOrder(models.Model):
             "customerPin": "P00000000004s"
             }
         """
+        no_hscode = self.lines.filtered(lambda line: not line.product_id.product_hs_code)
+        if no_hscode: raise UserError("An item is missing a valid item code. Please correct the product's HS Code.")
+                
         item_list = [{
             "itemCode": line.product_id.product_hs_code,
             "qty": line.qty,
