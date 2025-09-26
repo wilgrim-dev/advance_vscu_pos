@@ -187,7 +187,7 @@ class PosOrder(models.Model):
             else:
                 response.update({'hasError': True, 'message': _(f"Unsuccessful sign, message: {data['message']}")})
         except requests.exceptions.Timeout as e:
-            response.update({'hasError': True, 'message': _(e)})
+            response.update({'hasError': True, 'message': _("Connection Timeout! Check device connectivity.")})
             _logger.error(f'VSCU Error: {response}')
         except Exception as e:
             response.update({'hasError': True, 'message': _(e.response.json())})
