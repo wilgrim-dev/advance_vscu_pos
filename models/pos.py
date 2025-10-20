@@ -166,7 +166,7 @@ class PosOrder(models.Model):
             if not isinstance(payload, dict): return {"hasError": True, "message": "An item is missing a valid item code. Please correct the product's HS Code."}
             
             auth = HTTPBasicAuth(username, password)
-            _logger.info(f'VSCU Payload: {payload}, cred {url, username, password}')
+            _logger.info(f'VSCU Payload: {payload}')
             
             data = requests.post(url, json=payload, auth=auth, headers={'Content-Type': 'application/json'}, timeout=10)
             data.raise_for_status()
@@ -190,7 +190,7 @@ class PosOrder(models.Model):
             response.update({'hasError': True, 'message': _("Connection Timeout! Check device connectivity.")})
             _logger.error(f'VSCU Error: {response}')
         except Exception as e:
-            response.update({'hasError': True, 'message': _(e.response.json())})
+            response.update({'hasError': True, 'message': _(e)})
             _logger.error(f'VSCU Error: {response}')
         
         return response
