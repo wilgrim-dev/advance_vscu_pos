@@ -234,7 +234,9 @@ class ProductProduct(models.Model):
             _logger.info(f'VSCU Response: {data, product}')
             self.product_hs_code = data['data']['itemCode']
         except requests.exceptions.RequestException as e:
-            message = e.response.json()['message']
+            message = e
+            if e.response is not None:
+                message = e.response.json()['message']
             if message == 'Item with that name already exists':
                 try:
                     url = base_url + f'/items/{self.product_hs_code}'
@@ -262,7 +264,10 @@ class ProductProduct(models.Model):
                     _logger.error(message)
             raise ValidationError(message)
         except Exception as e:
-            raise ValidationError(e)
+            message = e
+            if e.response is not None:
+                message = e.response.json()['message']
+            raise ValidationError(message)
         
 
 class AccountTax(models.Model):
